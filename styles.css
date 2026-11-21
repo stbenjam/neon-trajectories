@@ -282,7 +282,7 @@ body {
   display: inline-block;
   margin-top: clamp(24px, 3.8vh, 42px);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 14.5px;
   letter-spacing: 0.12em;
   color: #8f887e;
   opacity: 0.9;
