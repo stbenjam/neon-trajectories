@@ -337,10 +337,22 @@
       if (e.key === "Escape") closeCatalog();
       return;
     }
-    if (e.key === "ArrowDown" || e.key === "j" || e.key === "PageDown") {
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowRight" ||
+      e.key === "j" ||
+      e.key === "l" ||
+      e.key === "PageDown"
+    ) {
       e.preventDefault();
       jumpToSlide(currentSlideIndex + 1);
-    } else if (e.key === "ArrowUp" || e.key === "k" || e.key === "PageUp") {
+    } else if (
+      e.key === "ArrowUp" ||
+      e.key === "ArrowLeft" ||
+      e.key === "k" ||
+      e.key === "h" ||
+      e.key === "PageUp"
+    ) {
       e.preventDefault();
       jumpToSlide(currentSlideIndex - 1);
     } else if (e.key === "Home") {
