@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini 4 Neon — 64,067 Exclamation Marks</title>
+    <meta
+      name="description"
+      content="35 verbatim moments of unbridled excitement from Gemini 4 Neon trajectories on Terminal-Bench 4.1."
+    />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Whisper-quiet top-right chrome -->
+    <div class="top-right-chrome" role="banner">
+      <span class="counter" id="progressReadout" aria-live="polite"></span>
+      <button
+        class="index-btn"
+        id="indexToggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="catalogDrawer"
+      >
+        index
+      </button>
+    </div>
+
+    <!-- Single hairline scroll rail -->
+    <div class="scroll-rail" aria-hidden="true">
+      <span class="scroll-dot" id="scrollDot"></span>
+    </div>
+
+    <main id="scrollTrack" class="scroll-track">
+      <div class="stage-sticky">
+        <div class="slides-viewport" id="slidesViewport"></div>
+      </div>
+      <div class="snap-anchors" id="snapAnchors" aria-hidden="true"></div>
+    </main>
+
+    <!-- Full-context quote modal (opened by clicking any quote) -->
+    <div
+      class="modal-overlay"
+      id="quoteModal"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTask"
+    >
+      <div class="modal-card">
+        <div class="modal-top">
+          <div class="modal-meta">
+            <span class="modal-task" id="modalTask"></span>
+            <span class="modal-status" id="modalStatus"></span>
+          </div>
+          <button class="modal-close" id="modalClose" type="button" aria-label="Close modal">
+            esc
+          </button>
+        </div>
+
+        <p class="modal-header-tag" id="modalHeaderTag"></p>
+        <blockquote class="modal-full-quote" id="modalFullQuote"></blockquote>
+        <p class="modal-note" id="modalNote"></p>
+
+        <div class="modal-foot">
+          <span class="modal-step" id="modalStep"></span>
+          <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener noreferrer">
+            inspect trial on harbor hub ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minimal slide-over index -->
+    <div
+      class="catalog-overlay"
+      id="catalogDrawer"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-label="Quote index"
+    >
+      <div class="catalog-sheet">
+        <div class="catalog-head">
+          <div class="catalog-filters" id="filterBar">
+            <button class="filter-btn is-active" data-filter="all" type="button">all</button>
+            <button class="filter-btn" data-filter="peak" type="button">peak joy</button>
+            <button class="filter-btn" data-filter="mundane" type="button">mundane awe</button>
+            <button class="filter-btn" data-filter="allcaps" type="button">all-caps</button>
+            <button class="filter-btn" data-filter="failed" type="button">failed</button>
+          </div>
+          <button class="catalog-close" id="catalogClose" type="button">esc</button>
+        </div>
+        <div class="catalog-list" id="catalogList"></div>
+      </div>
+    </div>
+
+    <script src="quotes.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
