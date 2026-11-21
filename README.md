@@ -2,7 +2,7 @@
 
 35 verbatim moments of unbridled excitement mined from 323 [Gemini 4 Neon (`xhigh`)](https://hub.harborframework.com/jobs/dc187a75-4c76-52ea-8616-eb89847d4542) trajectories on Terminal-Bench 4.1.
 
-Live site: **https://stbenjam.github.io/neon-trajectories/**
+Live site: **https://bitbin.de/neon-trajectories/**
 
 ## Running Locally
 
