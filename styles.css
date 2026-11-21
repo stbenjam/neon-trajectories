@@ -211,17 +211,38 @@ body {
   appearance: none;
   background: none;
   border: 0;
-  padding: 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  color: var(--fg-faint);
+  padding: 6px 0;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.8vw, 44px);
+  letter-spacing: -0.02em;
+  color: #a8a196;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
   transition: color 0.2s ease;
 }
 
 .scroll-cue:hover {
   color: var(--amber);
+}
+
+.scroll-arrow {
+  display: inline-block;
+  color: var(--amber);
+  animation: scroll-bob 1.9s ease-in-out infinite;
+}
+
+@keyframes scroll-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
 }
 
 /* ---------------- FULL-SCREEN QUOTE ---------------- */
@@ -621,5 +642,8 @@ body {
   }
   .slide {
     filter: none !important;
+  }
+  .scroll-arrow {
+    animation: none;
   }
 }

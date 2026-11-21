@@ -98,7 +98,10 @@
         <p class="cover-sub">
           ${ALL_QUOTES.length} verbatim moments from ${META.trajectoriesScanned} trajectories—click any quote for full context.
         </p>
-        <button class="scroll-cue" type="button" data-jump="1">scroll ↓</button>
+        <button class="scroll-cue" type="button" data-jump="1">
+          <span>scroll</span>
+          <span class="scroll-arrow" aria-hidden="true">↓</span>
+        </button>
       </div>
     `;
     el.querySelector("[data-jump]")?.addEventListener("click", () => jumpToSlide(1));
