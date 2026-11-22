@@ -29,6 +29,7 @@ body {
   color: var(--fg);
   font-family: var(--font-mono);
   overflow: hidden;
+  overscroll-behavior-y: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

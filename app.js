@@ -302,13 +302,15 @@
     }
   }
 
+  const hasNativeScrollEnd = "onscrollend" in window;
+
   function scheduleRender() {
     if (rafId === null) {
       rafId = window.requestAnimationFrame(renderFrame);
     }
-    if (isTouchDevice) {
+    if (isTouchDevice && !hasNativeScrollEnd) {
       clearTimeout(settleTimer);
-      settleTimer = setTimeout(settleTouchSnap, 140);
+      settleTimer = setTimeout(settleTouchSnap, 260);
     }
   }
 
