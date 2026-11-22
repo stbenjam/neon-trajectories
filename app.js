@@ -2,7 +2,7 @@
   const META = window.NEON_ARCHIVE_META;
   const ALL_QUOTES = window.NEON_QUOTES || [];
 
-  const scrollTrack = document.getElementById("scrollTrack");
+  const scroller = document.getElementById("scroller");
   const slidesViewport = document.getElementById("slidesViewport");
   const snapAnchors = document.getElementById("snapAnchors");
   const progressReadout = document.getElementById("progressReadout");
@@ -24,12 +24,26 @@
   const modalLink = document.getElementById("modalLink");
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isTouchDevice = window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
   let activeFilter = "all";
   let filteredQuotes = [...ALL_QUOTES];
   let slideElements = [];
   let currentSlideIndex = 0;
+  let stageHeight = 1;
   let rafId = null;
+  let settleTimer = null;
+
+  function syncStageHeight() {
+    const prevHeight = stageHeight;
+    const nextHeight = scroller.clientHeight || window.innerHeight || 1;
+    stageHeight = nextHeight;
+    scroller.style.setProperty("--stage-h", `${stageHeight}px`);
+    // Keep current slide aligned on orientation / mobile bar resize
+    if (prevHeight > 1 && Math.abs(prevHeight - nextHeight) > 2) {
+      scroller.scrollTop = currentSlideIndex * stageHeight;
+    }
+  }
 
   function escapeHtml(str) {
     return str
@@ -63,6 +77,10 @@
     return String(n).padStart(2, "0");
   }
 
+  function setScrollLocked(locked) {
+    scroller.style.overflowY = locked ? "hidden" : "auto";
+  }
+
   function openQuoteModal(q) {
     const isPass = q.reward === 1;
     modalTask.textContent = q.task;
@@ -77,14 +95,14 @@
     modalLink.href = q.url;
 
     quoteModal.hidden = false;
-    document.body.style.overflow = "hidden";
+    setScrollLocked(true);
     modalClose.focus();
   }
 
   function closeQuoteModal() {
     quoteModal.hidden = true;
     if (catalogDrawer.hidden) {
-      document.body.style.overflow = "";
+      setScrollLocked(false);
     }
   }
 
@@ -182,8 +200,6 @@
     snapAnchors.innerHTML = "";
 
     const totalSlides = filteredQuotes.length + 2;
-    scrollTrack.style.height = `${totalSlides * 100}svh`;
-
     slideElements = [];
 
     const cover = buildCoverSlide();
@@ -206,6 +222,7 @@
       snapAnchors.appendChild(anchor);
     }
 
+    syncStageHeight();
     buildCatalogList();
     renderFrame();
   }
@@ -214,11 +231,16 @@
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
+  function getProgress() {
+    const h = scroller.clientHeight || stageHeight || 1;
+    const maxProgress = Math.max(1, slideElements.length - 1);
+    return Math.max(0, Math.min(maxProgress, scroller.scrollTop / h));
+  }
+
   function renderFrame() {
-    const vh = window.innerHeight || 1;
     const totalSlides = slideElements.length;
     const maxProgress = Math.max(1, totalSlides - 1);
-    const rawProgress = Math.max(0, Math.min(maxProgress, window.scrollY / vh));
+    const rawProgress = getProgress();
     const nearest = Math.round(rawProgress);
 
     scrollDot.style.top = `${(rawProgress / maxProgress) * 100}%`;
@@ -246,7 +268,7 @@
         const eased = easeInOutCubic(t);
         opacity = 1 - eased;
         shiftY = (delta > 0 ? -18 : 18) * eased;
-        blurPx = prefersReducedMotion ? 0 : 12 * eased;
+        blurPx = prefersReducedMotion ? 0 : 10 * eased;
       }
 
       el.classList.add("is-visible");
@@ -269,17 +291,32 @@
     rafId = null;
   }
 
+  // On touch devices, ensure scroll never rests off-center/blurred if OS inertia stops short
+  function settleTouchSnap() {
+    if (!isTouchDevice) return;
+    const h = scroller.clientHeight || stageHeight || 1;
+    const raw = getProgress();
+    const target = Math.round(raw);
+    if (Math.abs(raw - target) > 0.02) {
+      scroller.scrollTo({ top: target * h, behavior: "smooth" });
+    }
+  }
+
   function scheduleRender() {
     if (rafId === null) {
       rafId = window.requestAnimationFrame(renderFrame);
+    }
+    if (isTouchDevice) {
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(settleTouchSnap, 140);
     }
   }
 
   function jumpToSlide(index) {
     const clamped = Math.max(0, Math.min(slideElements.length - 1, index));
-    const vh = window.innerHeight || 1;
-    window.scrollTo({
-      top: clamped * vh,
+    const h = scroller.clientHeight || stageHeight || 1;
+    scroller.scrollTo({
+      top: clamped * h,
       behavior: prefersReducedMotion ? "auto" : "smooth",
     });
   }
@@ -287,19 +324,32 @@
   function openCatalog() {
     catalogDrawer.hidden = false;
     indexToggle.setAttribute("aria-expanded", "true");
-    document.body.style.overflow = "hidden";
+    setScrollLocked(true);
   }
 
   function closeCatalog() {
     catalogDrawer.hidden = true;
     indexToggle.setAttribute("aria-expanded", "false");
     if (quoteModal.hidden) {
-      document.body.style.overflow = "";
+      setScrollLocked(false);
     }
   }
 
-  window.addEventListener("scroll", scheduleRender, { passive: true });
-  window.addEventListener("resize", scheduleRender, { passive: true });
+  scroller.addEventListener("scroll", scheduleRender, { passive: true });
+  scroller.addEventListener("scrollend", () => {
+    clearTimeout(settleTimer);
+    renderFrame();
+    settleTouchSnap();
+  });
+
+  window.addEventListener(
+    "resize",
+    () => {
+      syncStageHeight();
+      scheduleRender();
+    },
+    { passive: true }
+  );
 
   modalClose.addEventListener("click", closeQuoteModal);
   quoteModal.addEventListener("click", (e) => {
@@ -327,7 +377,7 @@
     });
     rebuildDeck();
     closeCatalog();
-    window.scrollTo({ top: nextFilter === "all" ? 0 : window.innerHeight, behavior: "smooth" });
+    jumpToSlide(nextFilter === "all" ? 0 : 1);
   });
 
   window.addEventListener("keydown", (e) => {
@@ -379,7 +429,7 @@
   if (hashMatch) {
     const idx = parseInt(hashMatch[1], 10);
     if (!Number.isNaN(idx)) {
-      window.scrollTo(0, idx * window.innerHeight);
+      scroller.scrollTop = idx * stageHeight;
       renderFrame();
     }
   }

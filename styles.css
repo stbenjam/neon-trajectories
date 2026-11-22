@@ -19,21 +19,19 @@
   box-sizing: border-box;
 }
 
-html {
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-mono);
-  scroll-snap-type: y proximity;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  overflow-x: hidden;
 }
 
 ::selection {
@@ -100,17 +98,38 @@ body {
   will-change: top;
 }
 
-/* Scrollytelling track + full-screen sticky stage */
-.scroll-track {
-  position: relative;
+/* Dedicated full-viewport scroll container */
+.scroller {
+  position: fixed;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  scroll-snap-type: y proximity;
+  scrollbar-width: none;
+}
+
+.scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile / touch: 1 swipe = 1 full quote, never stops half-blurred or skips */
+@media (hover: none), (pointer: coarse) {
+  .scroller {
+    scroll-snap-type: y mandatory;
+  }
 }
 
 .stage-sticky {
   position: sticky;
   top: 0;
-  height: 100svh;
   width: 100%;
+  height: var(--stage-h, 100%);
+  margin-bottom: calc(-1 * var(--stage-h, 100%));
   z-index: 10;
 }
 
@@ -163,16 +182,15 @@ body {
 }
 
 .snap-anchors {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   pointer-events: none;
 }
 
 .snap-anchor {
-  height: 100svh;
+  height: var(--stage-h, 100%);
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /* ---------------- COVER ---------------- */
